@@ -8,8 +8,9 @@
 // #include <localization/KalmanFilter.h>
 
 
-
-class ParticleFilter;
+// class ParticleFilter;
+class DynamicGridFilter;
+// class GridFilter;
 class Point2D;
 
 class LocalizationModule : public Module {
@@ -32,7 +33,9 @@ class LocalizationModule : public Module {
     MemoryCache cache_;
     TextLogger*& tlogger_;
     LocalizationParams params_;
-    ParticleFilter* pfilter_;
+    // ParticleFilter* pfilter_;
+    DynamicGridFilter* dgfilter_;
+    // GridFilter* gfilter_;
     ExtendedKalmanFilter* KF_;
 
     float lastBallX=-1;

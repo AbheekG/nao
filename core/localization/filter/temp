@@ -1,0 +1,116 @@
+1c1
+< // #include <localization/filter/DynamicGridFilter.hh>
+---
+> #include "filter.hh"
+2a3
+> #include <algorithm>
+6,7d6
+<   cout << "\n\n\nDynamic filter initialized. " << _thr_h <<  "\n\n\n";
+< 
+23,27c22,26
+<   // name = "dynamic-grid-" + std::to_string(thr_l) + "-" + std::to_string(thr_h) + ".csv";
+<   // string path = get_test_path() + "cdf-" + name;
+<   // cdf_fid.open(path);
+<   // path = get_test_path() + "pdf-" + name;
+<   // pdf_fid.open(path);
+---
+>   name = "dynamic-grid-" + std::to_string(thr_l) + "-" + std::to_string(thr_h) + ".csv";
+>   string path = get_test_path() + "cdf-" + name;
+>   cdf_fid.open(path);
+>   path = get_test_path() + "pdf-" + name;
+>   pdf_fid.open(path);
+32c31
+<   // clock_start ();
+---
+>   clock_start ();
+55c54
+<   // clock_stop ();
+---
+>   clock_stop ();
+60,69d58
+< 
+<   state_t max_state(get_dim());
+<   get_max_state (root, max_state);
+< 
+<   // Nao
+<   assert (max_state.size() == 3);
+<   current.x = max_state[0];
+<   current.y = max_state[1];
+<   current.t = max_state[2];
+<   store_cdf ();
+84,91d72
+< 
+<   // TEMP
+<   cout << "New node created.\n";
+<   cout << "\tWeight = " << x->w * x->s;
+<   cout << "\tBounds: ";
+<   for (int i = 0; i < get_dim(); ++i )
+<     cout << "( (" << x->dim_bounds[LOWER][i] << " , " << x->dim_bounds[UPPER][i];
+< 
+271c252
+<   // io_store_pdf (cdf);
+---
+>   io_store_pdf (cdf);
+273,276c254
+<   // io_store_cdf (cdf);
+< 
+<   // Nao
+<   generate_particles (cdf);
+---
+>   io_store_cdf (cdf);
+301,304c279,282
+<   int temp; cin >> temp;
+<   static int iter_depth = 0;
+<   iter_depth++;
+<   cout << "Iteration depth = " << iter_depth << endl;
+---
+>   // int temp; cin >> temp;
+>   // static int iter_depth = 0;
+>   // iter_depth++;
+>   // cout << "Iteration depth = " << iter_depth << endl;
+306,307c284,285
+<   cout << "( (" << x->dim_bounds[LOWER][0] << " , " << x->dim_bounds[UPPER][0];
+<   cout << " ) , " << x->w * x->s << " )\n";
+---
+>   // cout << "( (" << x->dim_bounds[LOWER][0] << " , " << x->dim_bounds[UPPER][0];
+>   // cout << " ) , " << x->w * x->s << " )\n";
+319c297
+<   iter_depth--;
+---
+>   // iter_depth--;
+331,351d308
+< double DynamicGridFilter::get_max_state (node* x, state_t &max_state) {
+< 
+<   if (x->ch.size() == 0) {
+<     for (int i = 0; i < get_dim(); ++i) {
+<       max_state[i] = (x->dim_bounds[LOWER][i] + x->dim_bounds[UPPER][i])/2;
+<     }
+<     return x->w;
+<   } else {
+<     double max_wt = 0, temp_wt;
+<     state_t temp_state(get_dim());
+<     for (const auto &child : x->ch) {
+<       temp_wt = get_max_state (child, temp_state);
+<       if (temp_wt > max_wt) {
+<         max_wt = temp_wt;
+<         max_state = temp_state;
+<       }
+<     }
+<     return max_wt;
+<   }
+< }
+< 
+356,357c313,314
+<   // pdf_fid.close();
+<   // cdf_fid.close();
+---
+>   pdf_fid.close();
+>   cdf_fid.close();
+365,371d321
+< 
+<   // TEMP
+<   cout << "Node destroyed.\n";
+<   cout << "\tWeight = " << x->w * x->s;
+<   cout << "\tBounds: ";
+<   for (int i = 0; i < get_dim(); ++i )
+<     cout << "( (" << x->dim_bounds[LOWER][i] << " , " << x->dim_bounds[UPPER][i];

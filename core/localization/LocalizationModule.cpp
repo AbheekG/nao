@@ -4,17 +4,26 @@
 #include <memory/GameStateBlock.h>
 #include <memory/RobotStateBlock.h>
 #include <localization/ParticleFilter.h>
+#include "filter/DynamicGridFilter.hh"
+#include "filter/GridFilter.hh"
 #include <localization/Logging.h>
 
 
 #define T 30.0
 
 // Boilerplate
-LocalizationModule::LocalizationModule() : tlogger_(textlogger), pfilter_(new ParticleFilter(cache_, tlogger_)) {
+// LocalizationModule::LocalizationModule() : tlogger_(textlogger), pfilter_(new ParticleFilter(cache_, tlogger_)) {
+LocalizationModule::LocalizationModule() : tlogger_(textlogger), dgfilter_(new DynamicGridFilter(cache_, tlogger_)) {
+// LocalizationModule::LocalizationModule() : tlogger_(textlogger), gfilter_(new GridFilter(cache_, tlogger_)) {
+  Filter::filter_init ("NA");
 }
 
 LocalizationModule::~LocalizationModule() {
-  delete pfilter_;
+  // delete pfilter_;
+  dgfilter_->destroy ();
+  delete dgfilter_;
+  // gfilter_->destroy ();
+  // delete gfilter_;
 }
 
 // Boilerplate
@@ -58,12 +67,16 @@ void LocalizationModule::initFromMemory() {
 void LocalizationModule::initFromWorld() {
   reInit();
   auto& self = cache_.world_object->objects_[cache_.robot_state->WO_SELF];
-  pfilter_->init(self.loc, self.orientation);
+  // pfilter_->init(self.loc, self.orientation);
+  // gfilter_->init(2);
+  dgfilter_->init(0, 0.02);
 }
 
 // Reinitialize from scratch
 void LocalizationModule::reInit() {
-  pfilter_->init(Point2D(-750,0), 0.0f);
+  // pfilter_->init(Point2D(-750,0), 0.0f);
+  // gfilter_->init(2);
+  dgfilter_->init(0, 0.02);
   cache_.localization_mem->player_ = Point2D(-750,0);
   cache_.localization_mem->state = decltype(cache_.localization_mem->state)::Zero();
   cache_.localization_mem->covariance = decltype(cache_.localization_mem->covariance)::Identity();
@@ -88,9 +101,17 @@ void LocalizationModule::processFrame() {
 
   // Process the current frame and retrieve our location/orientation estimate
   // from the particle filter
-  pfilter_->processFrame();
-  self.loc = pfilter_->pose().translation;
-  self.orientation = pfilter_->pose().rotation;
+  // pfilter_->processFrame();
+  // self.loc = pfilter_->pose().translation;
+  // self.orientation = pfilter_->pose().rotation;
+  // gfilter_->process();
+  // self.loc = gfilter_->current_state().translation;
+  // self.orientation = gfilter_->current_state().rotation;
+  dgfilter_->process();
+  self.loc = dgfilter_->current_state().translation;
+  self.orientation = dgfilter_->current_state().rotation;
+  printf("Localization Update: x=%2.f, y=%2.f, theta=%2.2f\n", self.loc.x, self.loc.y, self.orientation * RAD_T_DEG);
+
   log(40, "Localization Update: x=%2.f, y=%2.f, theta=%2.2f", self.loc.x, self.loc.y, self.orientation * RAD_T_DEG);
     
   //TODO: modify this block to use your Kalman filter implementation
